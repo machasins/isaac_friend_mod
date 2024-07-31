@@ -5,10 +5,11 @@ local saveData = {}
 local START_WITH_BONE_HEARTS = true
 
 local STARTING_ITEMS = {
+    CollectibleType.COLLECTIBLE_ACT_OF_CONTRITION,
 }
 
 local BIRTHRIGHT_ITEMS = {
-    CollectibleType.COLLECTIBLE_ACT_OF_CONTRITION,
+    CollectibleType.COLLECTIBLE_GOAT_HEAD,
 }
 
 local SMELTED_TRINKETS = {
@@ -201,7 +202,7 @@ CHAR_WILL:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, CHAR_WILL.Save)
 
 if EID then
     EID:addBirthright(CHAR_WILL.Type,
-        "Taking devil deals no longer stops angel rooms from appearing"
+        "{{AngelDevilChance}} 100% Devil/Angel Room chance"
     )
 end
 
