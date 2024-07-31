@@ -1,10 +1,13 @@
 local json = require("json")
-local hidden_items = require(CHAR_UNNAMED.Scripts .. ".hidden_item_manager")
+local hidden_items = require(CHAR_WILL.Scripts .. ".hidden_item_manager")
 local saveData = {}
 
 local START_WITH_BONE_HEARTS = true
 
 local STARTING_ITEMS = {
+}
+
+local BIRTHRIGHT_ITEMS = {
     CollectibleType.COLLECTIBLE_ACT_OF_CONTRITION,
 }
 
@@ -12,7 +15,7 @@ local SMELTED_TRINKETS = {
     TrinketType.TRINKET_PAY_TO_WIN,
 }
 
-hidden_items:Init(CHAR_UNNAMED)
+hidden_items:Init(CHAR_WILL)
 
 --#region LOCAL FUNCTIONS
 
@@ -48,7 +51,7 @@ local STATS = {
     ADD = {
         SPEED = 0.0,
         DMG = 0.0,
-        TEAR = -0.72,
+        TEAR = 0.0,
         RANGE = 0.0,
         SHOT = -0.25,
         LUCK = 2.0,
@@ -102,9 +105,9 @@ local STATS = {
 ---Run when evaluating stats
 ---@param player EntityPlayer
 ---@param flag CacheFlag
-function CHAR_UNNAMED:HandleStartingStats(player, flag)
-    if player:GetPlayerType() ~= CHAR_UNNAMED.Type then
-        return -- End the function early. The below code doesn't run, as long as the player isn't Unnamed.
+function CHAR_WILL:HandleStartingStats(player, flag)
+    if player:GetPlayerType() ~= CHAR_WILL.Type then
+        return -- End the function early. The below code doesn't run, as long as the player isn't Will.
     end
 
     -- Loop through all internal names for stats
@@ -117,7 +120,7 @@ function CHAR_UNNAMED:HandleStartingStats(player, flag)
     end
 end
 
-CHAR_UNNAMED:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, CHAR_UNNAMED.HandleStartingStats)
+CHAR_WILL:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, CHAR_WILL.HandleStartingStats)
 
 --#endregion
 
@@ -125,8 +128,8 @@ CHAR_UNNAMED:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, CHAR_UNNAMED.HandleStar
 
 ---Run when player is initialized
 ---@param player EntityPlayer
-function CHAR_UNNAMED:Init(player)
-    if player:GetPlayerType() ~= CHAR_UNNAMED.Type then
+function CHAR_WILL:Init(player)
+    if player:GetPlayerType() ~= CHAR_WILL.Type then
         return
     end
 
@@ -144,12 +147,12 @@ function CHAR_UNNAMED:Init(player)
     end
 end
 
-CHAR_UNNAMED:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, CHAR_UNNAMED.Init)
+CHAR_WILL:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, CHAR_WILL.Init)
 
 ---Run when player effects are updated
 ---@param player EntityPlayer
-function CHAR_UNNAMED:InnateUpdate(player)
-    if player:GetPlayerType() ~= CHAR_UNNAMED.Type then
+function CHAR_WILL:InnateUpdate(player)
+    if player:GetPlayerType() ~= CHAR_WILL.Type then
         return
     end
 
@@ -158,30 +161,48 @@ function CHAR_UNNAMED:InnateUpdate(player)
         hidden_items:CheckStack(player, item, 1)
         player:RemoveCostume(Isaac.GetItemConfig():GetCollectible(item))
     end
+
+    -- Add birthright items
+    if player:HasCollectible(CollectibleType.COLLECTIBLE_BIRTHRIGHT) then
+        for _, item in pairs(BIRTHRIGHT_ITEMS) do
+            hidden_items:CheckStack(player, item, 1)
+            player:RemoveCostume(Isaac.GetItemConfig():GetCollectible(item))
+        end
+    end
 end
 
-CHAR_UNNAMED:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, CHAR_UNNAMED.InnateUpdate)
+CHAR_WILL:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, CHAR_WILL.InnateUpdate)
 
 --#endregion
 
 --#region SAVING AND LOADING
 
 ---Save data
-function CHAR_UNNAMED:Save()
+function CHAR_WILL:Save()
     saveData.HIDDEN_ITEMS = hidden_items:GetSaveData()
-    CHAR_UNNAMED:SaveData(json.encode(saveData))
+    CHAR_WILL:SaveData(json.encode(saveData))
 end
 
-CHAR_UNNAMED:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL, CHAR_UNNAMED.Save)
+CHAR_WILL:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL, CHAR_WILL.Save)
 
 ---Load data
-function CHAR_UNNAMED:Load()
-    if CHAR_UNNAMED:HasData() then
-        saveData = json.decode(CHAR_UNNAMED:LoadData())
+function CHAR_WILL:Load()
+    if CHAR_WILL:HasData() then
+        saveData = json.decode(CHAR_WILL:LoadData())
         hidden_items:LoadData(saveData.HIDDEN_ITEMS)
     end
 end
 
-CHAR_UNNAMED:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, CHAR_UNNAMED.Save)
+CHAR_WILL:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, CHAR_WILL.Save)
+
+--#endregion
+
+--#region ITEM DESCRIPTIONS
+
+if EID then
+    EID:addBirthright(CHAR_WILL.Type,
+        "Taking devil deals no longer stops angel rooms from appearing"
+    )
+end
 
 --#endregion

@@ -1,14 +1,14 @@
 <players root="gfx/characters/costumes/" portraitroot="gfx/ui/stage/" nameimageroot="gfx/ui/boss/">
-    <player name="Unnamed"
-        skin="character_unnamed.png"
-        nameimage="playername_unnamed.png"
+    <player name="Will"
+        skin="character_will.png"
+        nameimage="playername_will.png"
         hp="4"
         armor="0"
         keys="0"
-        portrait="playerportrait_unnamed.png"
+        portrait="playerportrait_will.png"
         skinColor="-1"
-        costumeSuffix="unnamed"
-        brithright="heyo"
+        costumeSuffix="will"
+        brithright="morality unquestioned"
         items="609"
     />
 </players>
