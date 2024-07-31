@@ -1,0 +1,14 @@
+<players root="gfx/characters/costumes/" portraitroot="gfx/ui/stage/" nameimageroot="gfx/ui/boss/">
+    <player name="Unnamed"
+        skin="character_unnamed.png"
+        nameimage="playername_unnamed.png"
+        hp="8"
+        armor="0"
+        keys="0"
+        portrait="playerportrait_unnamed.png"
+        skinColor="-1"
+        costumeSuffix="unnamed"
+        brithright="heyo"
+        items="609"
+    />
+</players>
