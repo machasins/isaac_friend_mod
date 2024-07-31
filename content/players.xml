@@ -2,7 +2,7 @@
     <player name="Unnamed"
         skin="character_unnamed.png"
         nameimage="playername_unnamed.png"
-        hp="8"
+        hp="4"
         armor="0"
         keys="0"
         portrait="playerportrait_unnamed.png"

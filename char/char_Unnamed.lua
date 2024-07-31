@@ -2,6 +2,8 @@ local json = require("json")
 local hidden_items = require(CHAR_UNNAMED.Scripts .. ".hidden_item_manager")
 local saveData = {}
 
+local START_WITH_BONE_HEARTS = true
+
 local STARTING_ITEMS = {
     CollectibleType.COLLECTIBLE_ACT_OF_CONTRITION,
 }
@@ -32,11 +34,21 @@ end
 
 --#region STAT DEFINITIONS
 
+---@alias STAT_NAME string
+---@alias STAT_CALC fun(stat:number, mult:number, add:number):number
+
+---@class STAT_CONTAINER
+---@field ADD table<STAT_NAME, number> Additional stats the character should get
+---@field MULT table<STAT_NAME, number> Multipliers for stats the character should get
+---@field MOD_FUNC table<STAT_NAME, STAT_CALC> How the stat should be calculated
+---@field PLAYER_VARS table<STAT_NAME, string> Mapping of player variables to internal stat names
+---@field FLAGS table<STAT_NAME, CacheFlag> Mapping of Cache flags to internal stat names
+---@field INTERNAL_NAMES STAT_NAME[] The internal names of player's stats
 local STATS = {
     ADD = {
         SPEED = 0.0,
         DMG = 0.0,
-        TEAR = -0.7,
+        TEAR = -0.72,
         RANGE = 0.0,
         SHOT = -0.25,
         LUCK = 2.0,
@@ -95,8 +107,11 @@ function CHAR_UNNAMED:HandleStartingStats(player, flag)
         return -- End the function early. The below code doesn't run, as long as the player isn't Unnamed.
     end
 
+    -- Loop through all internal names for stats
     for _, name in ipairs(STATS.INTERNAL_NAMES) do
+        -- If the stat is being updated
         if flag == STATS.FLAGS[name] then
+            -- Calculate the stat's new value
             player[STATS.PLAYER_VARS[name]] = STATS.MOD_FUNC[name](player[STATS.PLAYER_VARS[name]], STATS.MULT[name], STATS.ADD[name])
         end
     end
@@ -115,8 +130,17 @@ function CHAR_UNNAMED:Init(player)
         return
     end
 
+    -- Add trinkets
     for _, trinket in pairs(SMELTED_TRINKETS) do
         player:AddSmeltedTrinket(trinket)
+    end
+
+    -- Convert starting health to bone hearts
+    if START_WITH_BONE_HEARTS then
+        local heartAmount = player:GetMaxHearts()
+        player:AddMaxHearts(-heartAmount)
+        player:AddBoneHearts(heartAmount / 2)
+        player:AddHearts(heartAmount)
     end
 end
 
@@ -128,6 +152,8 @@ function CHAR_UNNAMED:InnateUpdate(player)
     if player:GetPlayerType() ~= CHAR_UNNAMED.Type then
         return
     end
+
+    -- Add innate items
     for _, item in pairs(STARTING_ITEMS) do
         hidden_items:CheckStack(player, item, 1)
         player:RemoveCostume(Isaac.GetItemConfig():GetCollectible(item))
