@@ -139,8 +139,8 @@ function CHAR_UNNAMED:Init(player)
     if START_WITH_BONE_HEARTS then
         local heartAmount = player:GetMaxHearts()
         player:AddMaxHearts(-heartAmount)
-        player:AddBoneHearts(heartAmount / 2)
-        player:AddHearts(heartAmount)
+        player:AddBoneHearts(heartAmount)
+        player:AddHearts(heartAmount * 2)
     end
 end
 
